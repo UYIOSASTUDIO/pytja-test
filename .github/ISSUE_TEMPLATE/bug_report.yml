@@ -1,0 +1,51 @@
+name: Bug Report
+description: File a bug report to help us improve the Pytja core engine.
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue. Please fill out the form below with as much technical detail as possible to help us reproduce the bug.
+  - type: input
+    id: version
+    attributes:
+      label: Pytja Version
+      description: Which version of Pytja are you using? (e.g., v1.0.2-pre)
+      placeholder: "v1.0.2-pre"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System & Architecture
+      description: e.g., macOS 14.3 (ARM64), Ubuntu 22.04 (x86_64), Windows 11
+      placeholder: "macOS ARM64"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps or CLI commands to reproduce the behavior.
+      value: |
+        1. Run command '...'
+        2. Load plugin '...'
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Kernel Logs / Panic Trace
+      description: Paste any relevant terminal output, panic traces, or TLS errors here.
+      render: shell
+    validations:
+      required: false

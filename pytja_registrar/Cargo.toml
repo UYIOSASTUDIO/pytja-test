@@ -1,0 +1,27 @@
+[package]
+name = "pytja_registrar"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pytja_registrar"
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+anyhow = "1.0"
+colored = "2.0"
+dialoguer = "0.10"
+chrono = "0.4"
+
+# Core & Crypto
+pytja_core = { path = "../pytja_core" }
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand = "0.8"
+base64 = "0.21"
+
+# Encryption
+aes-gcm = "0.10"
+pbkdf2 = "0.12"
+hmac = "0.12"
+sha2 = "0.10"

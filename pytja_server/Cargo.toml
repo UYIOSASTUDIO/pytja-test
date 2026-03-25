@@ -1,0 +1,40 @@
+[package]
+name = "pytja_server"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pytja_server"
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+tonic = { version = "0.10", features = ["tls"] }
+prost = "0.12"
+colored = "2.0"
+
+# Modules
+pytja_proto = { path = "../pytja_proto" }
+pytja_core = { path = "../pytja_core" }
+
+# Utilities
+chrono = "0.4"
+futures-util = "0.3"
+jsonwebtoken = "9.2" # Oder deine Version
+serde = { version = "1.0", features = ["derive"] } # <-- FEHLTE
+serde_json = "1.0"
+tracing = "0.1"
+dashmap = "5.5" # Oder 6.0
+bytes = "1.5" # <-- FEHLTE
+
+redis = { version = "0.26", features = ["tokio-comp", "json"] }
+clap = { version = "4.4", features = ["derive"] }
+
+tracing-subscriber = "0.3"
+uuid = { version = "1.4", features = ["v4", "fast-rng", "macro-diagnostics"] }
+base64 = "0.21"
+sysinfo = "0.29"
+tokio-stream = { version = "0.1", features = ["sync"] }
+dotenvy = "0.15"
+anyhow = "1.0.102"
+wasmtime = { version = "42.0.1", default-features = false, features = ["cranelift", "runtime", "std"] }

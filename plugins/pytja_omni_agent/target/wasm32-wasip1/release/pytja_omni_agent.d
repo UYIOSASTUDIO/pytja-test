@@ -1,0 +1,1 @@
+/Users/eliasschmolke/RustroverProjects/pytja_project/plugins/pytja_omni_agent/target/wasm32-wasip1/release/pytja_omni_agent.wasm: /Users/eliasschmolke/RustroverProjects/pytja_project/plugins/pytja_omni_agent/src/main.rs

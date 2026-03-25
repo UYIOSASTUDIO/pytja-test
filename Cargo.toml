@@ -1,0 +1,28 @@
+[package]
+name = "pytja"
+version = "1.0.0"
+edition = "2021"
+description = "Secure Data Sandbox V1"
+
+[workspace]
+members = [
+    "pytja_core",
+    "pytja_proto",
+    "pytja_server",
+    "pytja_shell",
+    "pytja_admin",
+    "pytja_registrar",
+    "pytja_window",
+    "pytja_sdk",
+]
+
+[dependencies]
+pytja_server = { path = "pytja_server" }
+pytja_shell = { path = "pytja_shell" }
+pytja_admin = { path = "pytja_admin" }
+pytja_registrar = { path = "pytja_registrar" }
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+anyhow = "1.0"
+clap = { version = "4.4", features = ["derive", "env"] }

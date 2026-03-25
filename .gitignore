@@ -1,0 +1,24 @@
+# Rust Build Artifacts
+/target/
+**/*.rs.bk
+
+# Environment & Secrets
+.env
+certs/
+*.pem
+*.key
+
+# Logs & History
+/logs/
+pytja_crash.log
+history.txt
+daemon.log
+
+# Databases (SQLite Caches)
+*.db
+*.sqlitepytja-macos/
+pytja-linux/
+pytja-windows/
+*.zip
+
+/storage_blobs/

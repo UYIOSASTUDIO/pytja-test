@@ -1,0 +1,6 @@
+target/
+.git/
+.env
+usb_drive/
+*.db
+*.log

@@ -1,0 +1,19 @@
+[server]
+host = "127.0.0.1"
+port = 50051
+
+[database]
+primary_url = "sqlite://data/pytja.db"
+
+[storage]
+storage_type = "fs"
+local_path = "data/storage"
+
+[tls]
+enabled = true
+cert_path = "certs/server.crt"
+key_path = "certs/server.key"
+
+[paths]
+logs_dir = "logs"
+mounts_file = "data/mounts.json"

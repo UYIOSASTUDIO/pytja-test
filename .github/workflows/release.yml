@@ -1,0 +1,72 @@
+name: Pytja Release Pipeline
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target_dir: pytja-macos
+            bin_name: pytja
+          - os: ubuntu-latest
+            target_dir: pytja-linux
+            bin_name: pytja
+          - os: windows-latest
+            target_dir: pytja-windows
+            bin_name: pytja.exe
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Protoc (gRPC compiler)
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Release Binary
+        run: cargo build --release
+
+      - name: Prepare Unix Artifacts
+        if: matrix.os != 'windows-latest'
+        run: |
+          mkdir -p ${{ matrix.target_dir }}
+          cp target/release/${{ matrix.bin_name }} ${{ matrix.target_dir }}/${{ matrix.target_dir }}
+          cp README.txt ${{ matrix.target_dir }}/
+          chmod +x ${{ matrix.target_dir }}/${{ matrix.target_dir }}
+          zip -r ${{ matrix.target_dir }}.zip ${{ matrix.target_dir }}
+          shasum -a 256 ${{ matrix.target_dir }}.zip > ${{ matrix.target_dir }}.zip.sha256
+
+      - name: Prepare Windows Artifacts
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path ${{ matrix.target_dir }}
+          Copy-Item -Path "target\release\${{ matrix.bin_name }}" -Destination "${{ matrix.target_dir }}\${{ matrix.target_dir }}.exe"
+          Copy-Item -Path "README.txt" -Destination "${{ matrix.target_dir }}\"
+          Compress-Archive -Path "${{ matrix.target_dir }}" -DestinationPath "${{ matrix.target_dir }}.zip"
+          $hash = (Get-FileHash "${{ matrix.target_dir }}.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  ${{ matrix.target_dir }}.zip" | Out-File -FilePath "${{ matrix.target_dir }}.zip.sha256" -Encoding ascii
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ matrix.target_dir }}.zip
+            ${{ matrix.target_dir }}.zip.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

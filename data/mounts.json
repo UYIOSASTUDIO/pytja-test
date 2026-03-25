@@ -1,0 +1,12 @@
+[
+  {
+    "name": "local_cache",
+    "path": "sqlite://data/pytja_local_cache.db",
+    "db_type": "Sqlite"
+  },
+  {
+    "name": "primary",
+    "path": "data/pytja.db",
+    "db_type": "Sqlite"
+  }
+]

@@ -1,0 +1,32 @@
+[package]
+name = "pytja_admin"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pytja_admin"
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+tonic = { version = "0.10.2", features = ["tls", "tls-roots"] }
+prost = "0.12"
+dialoguer = "0.10"
+comfy-table = "7.0"
+console = "0.15"
+indicatif = "0.17"
+anyhow = "1.0"
+
+pytja_core = { path = "../pytja_core" }
+pytja_proto = { path = "../pytja_proto" }
+
+# Crypto
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand = "0.8"
+base64 = "0.21"
+aes-gcm = "0.10"
+pbkdf2 = "0.12"
+hmac = "0.12"
+sha2 = "0.10"
+colored = "3.1.1"
+crossterm = "0.27"

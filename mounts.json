@@ -1,0 +1,7 @@
+[
+  {
+    "name": "local_cache",
+    "path": "sqlite:///Users/eliasschmolke/Library/Application Support/com.pytja.shell/pytja_local_cache.db",
+    "db_type": "Sqlite"
+  }
+]

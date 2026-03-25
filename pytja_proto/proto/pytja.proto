@@ -1,0 +1,588 @@
+syntax = "proto3";
+package pytja;
+
+service PytjaService {
+    rpc Ping (PingRequest) returns (PingResponse);
+    rpc ListDirectory (ListRequest) returns (ListResponse);
+    rpc CreateNode (CreateNodeRequest) returns (ActionResponse);
+    rpc ReadFile (ReadFileRequest) returns (ReadFileResponse);
+    rpc DeleteNode (DeleteNodeRequest) returns (ActionResponse);
+    rpc MoveNode (MoveNodeRequest) returns (ActionResponse);
+    rpc CopyNode (CopyNodeRequest) returns (ActionResponse);
+    rpc ChangeMode (ChangeModeRequest) returns (ActionResponse);
+    rpc ChownNode (ChownRequest) returns (ActionResponse);
+    rpc LockNode (LockRequest) returns (ActionResponse);
+    rpc GetUsage (UsageRequest) returns (UsageResponse);
+    rpc FindNode (FindRequest) returns (FindResponse);
+    rpc GrepNode (GrepRequest) returns (GrepResponse);
+    rpc StatNode (StatRequest) returns (StatResponse);
+    rpc GetTree (TreeRequest) returns (TreeResponse);
+    rpc UploadFile (stream UploadRequest) returns (ActionResponse);
+    rpc DownloadFile (DownloadRequest) returns (stream FileChunk);
+    rpc ExecScript (ExecRequest) returns (stream ExecResponse);
+    rpc GetChallenge (ChallengeRequest) returns (ChallengeResponse);
+    rpc Login (LoginRequest) returns (LoginResponse);
+    rpc KickUser (KickUserRequest) returns (ActionResponse);
+    rpc CreateRole (CreateRoleRequest) returns (AdminActionResponse);
+    rpc AddPermission (AddPermissionRequest) returns (AdminActionResponse);
+    rpc AssignRole (AssignRoleRequest) returns (AdminActionResponse);
+    rpc ListRoles (ListRolesRequest) returns (ListRolesResponse);
+    rpc GetActiveSessions (GetSessionsRequest) returns (GetSessionsResponse);
+    rpc BanUser (BanUserRequest) returns (BanUserResponse);
+    rpc ChangeUserRole (ChangeRoleRequest) returns (ChangeRoleResponse);
+    rpc GetMounts (GetMountsRequest) returns (GetMountsResponse);
+    rpc AddMount (AddMountRequest) returns (AdminActionResponse);
+    rpc RemoveMount (RemoveMountRequest) returns (AdminActionResponse);
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+    rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse);
+    rpc SetUserQuota(SetQuotaRequest) returns (SetQuotaResponse);
+    rpc GetSystemStats(SystemStatsRequest) returns (SystemStatsResponse);
+    rpc GetAuditLogs(GetAuditLogsRequest) returns (GetAuditLogsResponse);
+    rpc StreamServerLogs(LogStreamRequest) returns (stream LogStreamEntry);
+    rpc GenerateInviteCode (GenerateInviteRequest) returns (GenerateInviteResponse);
+    rpc RevokeInviteCode (RevokeInviteRequest) returns (AdminActionResponse);
+    rpc ListInviteCodes (ListInvitesRequest) returns (ListInvitesResponse);
+    rpc ReadFileChunk (ReadChunkRequest) returns (ReadChunkResponse);
+    rpc QueryMetadata (QueryMetadataRequest) returns (ListResponse);
+
+    // --- VECTOR STORE OPERATIONS ---
+    rpc CreateVectorCollection (CreateVectorCollectionRequest) returns (AdminActionResponse);
+    rpc DeleteVectorCollection (DeleteVectorCollectionRequest) returns (AdminActionResponse);
+    rpc ListVectorCollections (ListVectorCollectionsRequest) returns (ListVectorCollectionsResponse);
+    rpc VectorUpsert (VectorUpsertRequest) returns (VectorUpsertResponse);
+    rpc VectorSearch (VectorSearchRequest) returns (VectorSearchResponse);
+    rpc VectorGet (VectorGetRequest) returns (VectorGetResponse);
+    rpc VectorDelete (VectorDeleteRequest) returns (VectorDeleteResponse);
+    rpc VectorCount (VectorCountRequest) returns (VectorCountResponse);
+}
+
+// --- Messages (Data packages) ---
+
+message PingRequest {
+    string message = 1;
+}
+
+message PingResponse {
+    string message = 1;
+    string server_version = 2;
+    bool is_ready = 3;
+}
+
+message ListRequest {
+    string path = 1;
+    string auth_token = 2;
+    uint32 limit = 3;
+    uint32 offset = 4;
+}
+
+message FileInfo {
+    string name = 1;
+    bool is_folder = 2;
+    uint64 size = 3;
+    string owner = 4;
+    uint32 permissions = 5;
+    double created_at = 6;
+}
+
+message ListResponse {
+    repeated FileInfo files = 1;
+    bool has_more = 2;
+    uint32 total_count = 3;
+}
+
+message CreateNodeRequest {
+    string path = 1;
+    bool is_folder = 2;
+    bytes content = 3;
+    string lock_password = 4;
+    string owner = 5;
+}
+
+message ActionResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message ReadFileRequest {
+    string path = 1;
+    string password = 2;
+}
+
+message ReadFileResponse {
+    bool success = 1;
+    bytes content = 2;
+    string message = 3;
+}
+
+message DeleteNodeRequest {
+    string path = 1;
+}
+
+message MoveNodeRequest {
+    string source_path = 1;
+    string dest_path = 2;
+}
+
+message CopyNodeRequest {
+    string source_path = 1;
+    string dest_path = 2;
+    string owner = 3;
+}
+
+message ChangeModeRequest {
+    string path = 1;
+    uint32 permissions = 2;
+}
+
+message ChownRequest {
+    string path = 1;
+    string new_owner = 2;
+}
+
+message LockRequest {
+    string path = 1;
+    string password = 2;
+}
+
+message UsageRequest {
+    string owner = 1;
+}
+
+message UsageResponse {
+    uint64 bytes = 1;
+}
+
+message FindRequest {
+    string pattern = 1;
+}
+
+message FindResponse {
+    repeated string paths = 1;
+}
+
+message GrepRequest {
+    string pattern = 1;
+}
+
+message GrepResponse {
+    repeated string matches = 1;
+}
+
+message StatRequest {
+    string path = 1;
+}
+
+message StatResponse {
+    bool exists = 1;
+    bool is_folder = 2;
+    bool is_locked = 3;
+}
+
+message TreeRequest {
+    string root_path = 1;
+}
+
+message TreeResponse {
+    string tree_output = 1;
+}
+
+// --- STREAMING MESSAGES ---
+
+message UploadRequest {
+    oneof data {
+        FileMetadata metadata = 1;
+        bytes chunk = 2;
+    }
+}
+
+message FileMetadata {
+    string path = 1;
+    string lock_password = 2;
+    string owner = 3;
+    bool is_folder = 4;
+    optional string metadata = 5;
+}
+
+message DownloadRequest {
+    string path = 1;
+    string password = 2;
+}
+
+message FileChunk {
+    bytes content = 1;
+}
+
+message ExecRequest {
+    string script_path = 1;
+    repeated string args = 2;
+}
+
+message ExecResponse {
+    string output_line = 1;
+}
+
+message ChallengeRequest {
+    string username = 1;
+}
+
+message ChallengeResponse {
+    string challenge = 1;
+    bool user_exists = 2;
+}
+
+message LoginRequest {
+    string username = 1;
+    string challenge = 2;
+    string signature = 3;
+}
+
+message LoginResponse {
+    bool success = 1;
+    string token = 2;
+    string message = 3;
+}
+
+message SessionInfo {
+    string session_id = 1;
+    string username = 2;
+    string ip_address = 3;
+    int32 role_level = 4;
+    string login_time = 5;
+    string last_activity = 6;
+    string role = 7;
+}
+
+message GetSessionsRequest {}
+
+message GetSessionsResponse {
+    repeated SessionInfo sessions = 1;
+    int32 total_active = 2;
+}
+
+message KickUserRequest {
+    string session_id = 1;
+    string reason = 2;
+}
+
+// --- RBAC MANAGEMENT (ADMIN ONLY) ---
+
+message CreateRoleRequest {
+    string name = 1;
+}
+
+message AddPermissionRequest {
+    string role_name = 1;
+    string permission = 2;
+}
+
+message AssignRoleRequest {
+    string username = 1;
+    string role_name = 2;
+}
+
+message AdminActionResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message ListRolesRequest {}
+
+message RoleInfo {
+    string name = 1;
+    repeated string permissions = 2;
+}
+
+message ListRolesResponse {
+    repeated RoleInfo roles = 1;
+}
+
+message BanUserRequest {
+    string username = 1;
+    bool ban = 2;
+    string reason = 3;
+}
+
+message BanUserResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message ChangeRoleRequest {
+    string username = 1;
+    string new_role = 2;
+}
+
+message ChangeRoleResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Databases / Mounts
+message MountInfo {
+    string name = 1;
+    string type = 2;
+    string connection = 3;
+    bool is_connected = 4;
+}
+
+message GetMountsRequest {}
+message GetMountsResponse {
+    repeated MountInfo mounts = 1;
+}
+
+message AddMountRequest {
+    string name = 1;
+    string type = 2;
+    string connection_string = 3;
+}
+
+message RemoveMountRequest {
+    string name = 1;
+}
+
+// --- USER MANAGEMENT MESSAGES ---
+
+message UserData {
+    string username = 1;
+    string role = 2;
+    bool is_active = 3;
+    uint64 quota_used = 4;
+    uint64 quota_limit = 5;
+    string created_at = 6;
+}
+
+message ListUsersRequest {}
+message ListUsersResponse {
+    repeated UserData users = 1;
+}
+
+message RegisterUserResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message SetQuotaRequest {
+    string username = 1;
+    uint64 limit_bytes = 2;
+}
+message SetQuotaResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// --- SYSTEM & AUDIT MESSAGES ---
+
+message SystemStatsRequest {}
+message SystemStatsResponse {
+    double cpu_usage_percent = 1;
+    uint64 memory_usage_bytes = 2;
+    uint64 active_sessions = 3;
+    uint64 active_uploads = 4;
+    string uptime = 5;
+    bool redis_connected = 6;
+}
+
+message GetAuditLogsRequest {
+    uint32 limit = 1;
+    string filter_user = 2;
+}
+
+message AuditLogEntry {
+    string timestamp = 1;
+    string user = 2;
+    string action = 3;
+    string target = 4;
+}
+
+message GetAuditLogsResponse {
+    repeated AuditLogEntry logs = 1;
+}
+
+// Live Log Stream
+message LogStreamRequest {}
+message LogStreamEntry {
+    string level = 1;
+    string message = 2;
+    string timestamp = 3;
+}
+
+// --- INVITE SYSTEM MESSAGES ---
+
+message RegisterUserRequest {
+    string username = 1;
+    bytes public_key = 2;
+    string role = 3;
+    uint64 quota_limit = 4;
+    string invite_code = 5;
+}
+
+message GenerateInviteRequest {
+    string role = 1;
+    uint32 max_uses = 2;
+    uint64 quota_limit = 3;
+}
+
+message GenerateInviteResponse {
+    bool success = 1;
+    string code = 2;
+    string message = 3;
+}
+
+message RevokeInviteRequest {
+    string code = 1;
+}
+
+message InviteCodeInfo {
+    string code = 1;
+    string role = 2;
+    uint32 max_uses = 3;
+    uint32 used_count = 4;
+    string created_by = 5;
+    string created_at = 6;
+}
+
+message ListInvitesRequest {}
+
+message ListInvitesResponse {
+    repeated InviteCodeInfo invites = 1;
+}
+
+message ReadChunkRequest {
+    string path = 1;
+    uint64 offset = 2;
+    uint32 chunk_size = 3;
+    optional string password = 4;
+}
+
+message ReadChunkResponse {
+    bytes chunk = 1;
+    bool is_eof = 2;
+}
+
+message QueryMetadataRequest {
+    string query = 1;
+}
+
+// =============================================================================
+// --- VECTOR STORE MESSAGES ---
+// =============================================================================
+
+// --- Collection Management ---
+
+message CreateVectorCollectionRequest {
+    string mount_name = 1;          // Which vector mount to use
+    string collection_name = 2;     // Name of the new collection
+    uint32 dimension = 3;           // Vector dimensionality (e.g. 1536 for OpenAI, 768 for BERT)
+    string distance_metric = 4;     // "cosine", "l2", or "inner_product"
+}
+
+message DeleteVectorCollectionRequest {
+    string mount_name = 1;
+    string collection_name = 2;
+}
+
+message ListVectorCollectionsRequest {
+    string mount_name = 1;
+}
+
+message VectorCollectionInfo {
+    string name = 1;
+    uint32 dimension = 2;
+    string distance_metric = 3;
+    string owner = 4;
+    double created_at = 5;
+    uint64 vector_count = 6;
+}
+
+message ListVectorCollectionsResponse {
+    repeated VectorCollectionInfo collections = 1;
+}
+
+// --- Vector Upsert ---
+
+message VectorPointData {
+    string id = 1;                  // Unique vector ID
+    repeated float embedding = 2;   // The embedding vector
+    string metadata_json = 3;       // JSON-encoded metadata payload
+}
+
+message VectorUpsertRequest {
+    string mount_name = 1;
+    string collection_name = 2;
+    repeated VectorPointData points = 3;
+}
+
+message VectorUpsertResponse {
+    bool success = 1;
+    uint64 upserted_count = 2;
+    string message = 3;
+}
+
+// --- Vector Search ---
+
+message VectorSearchRequest {
+    string mount_name = 1;
+    string collection_name = 2;
+    repeated float query_vector = 3;    // The query embedding
+    uint32 top_k = 4;                   // Number of results to return
+    string filter_json = 5;             // Optional: JSON metadata filter
+}
+
+message VectorSearchHit {
+    string id = 1;
+    float score = 2;                    // Similarity score
+    string metadata_json = 3;           // JSON metadata payload
+    string owner = 4;
+}
+
+message VectorSearchResponse {
+    repeated VectorSearchHit hits = 1;
+    uint32 total_hits = 2;
+    double search_time_ms = 3;          // Query execution time
+}
+
+// --- Vector Get ---
+
+message VectorGetRequest {
+    string mount_name = 1;
+    string collection_name = 2;
+    repeated string ids = 3;
+}
+
+message VectorPointFull {
+    string id = 1;
+    repeated float embedding = 2;
+    string metadata_json = 3;
+    string owner = 4;
+    double created_at = 5;
+}
+
+message VectorGetResponse {
+    repeated VectorPointFull points = 1;
+}
+
+// --- Vector Delete ---
+
+message VectorDeleteRequest {
+    string mount_name = 1;
+    string collection_name = 2;
+    repeated string ids = 3;            // Delete by IDs
+    string filter_json = 4;             // OR delete by metadata filter
+}
+
+message VectorDeleteResponse {
+    bool success = 1;
+    uint64 deleted_count = 2;
+    string message = 3;
+}
+
+// --- Vector Count ---
+
+message VectorCountRequest {
+    string mount_name = 1;
+    string collection_name = 2;
+}
+
+message VectorCountResponse {
+    uint64 count = 1;
+}

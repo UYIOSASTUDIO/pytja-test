@@ -1,0 +1,11 @@
+{
+  "name": "pytja_omni_agent",
+  "version": "1.0.0",
+  "description": "Enterprise Omni-Agent Showcase for Pytja Radar",
+  "permissions": [
+    "fs_write",
+    "network_tcp",
+    "display_ui"
+  ],
+  "autostart": true
+}
