@@ -117,7 +117,6 @@ impl MyPytjaService {
 
         let mut infos = Vec::new();
         for col in collections {
-            // Get count for each collection
             let count = store.vector_count(&col.name).await.unwrap_or(0);
             infos.push(VectorCollectionInfo {
                 name: col.name,
@@ -192,7 +191,7 @@ impl MyPytjaService {
         &self,
         request: Request<VectorSearchRequest>,
     ) -> Result<Response<VectorSearchResponse>, Status> {
-        let claims = self.check_permissions(request.metadata(), Some("core:fs:read")).await?;
+        self.check_permissions(request.metadata(), Some("core:fs:read")).await?;
         let req = request.into_inner();
 
         if req.query_vector.is_empty() {

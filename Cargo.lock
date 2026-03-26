@@ -5370,8 +5370,12 @@ dependencies = [
 name = "pytja_sdk"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "pytja_proto",
  "serde",
  "serde_json",
+ "tokio",
+ "tonic",
 ]
 
 [[package]]

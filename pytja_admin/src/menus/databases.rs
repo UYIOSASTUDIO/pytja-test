@@ -87,7 +87,13 @@ async fn mount_wizard(client: &mut AdminClient) -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let db_types = vec!["SQLite (Local File)", "PostgreSQL (Remote Server)"];
+    let db_types = vec![
+        "SQLite (Local File)",
+        "PostgreSQL (Remote Server)",
+        "PgVector (Vector Store — PostgreSQL)",
+        "SqliteVec (Vector Store — Embedded)",
+    ];
+
     let type_selection = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Database Type")
         .items(&db_types)
@@ -101,7 +107,6 @@ async fn mount_wizard(client: &mut AdminClient) -> anyhow::Result<()> {
                 .with_prompt("Absolute Path to .db file")
                 .default("./data_storage/extra.db".into())
                 .interact_text()?;
-            // Automatisch sqlite:// Prefix hinzufügen, falls vergessen
             let conn = if path.starts_with("sqlite://") { path } else { format!("sqlite://{}", path) };
             ("sqlite", conn)
         },
@@ -111,6 +116,23 @@ async fn mount_wizard(client: &mut AdminClient) -> anyhow::Result<()> {
                 .with_prompt("Connection URL (postgres://user:pass@host:port/db)")
                 .interact_text()?;
             ("postgres", url)
+        },
+        2 => {
+            // PgVector
+            println!("\nRequires PostgreSQL with pgvector extension installed.");
+            let url: String = Input::with_theme(&ColorfulTheme::default())
+                .with_prompt("Connection URL (postgres://user:pass@host:port/db)")
+                .interact_text()?;
+            ("pgvector", url)
+        },
+        3 => {
+            // SqliteVec — Embedded Vector Store
+            println!("\nEmbedded vector store using SQLite. No external dependencies required.");
+            let path: String = Input::with_theme(&ColorfulTheme::default())
+                .with_prompt("Path to vector database file")
+                .default("./data/vectors.db".into())
+                .interact_text()?;
+            ("sqlite_vec", path)
         },
         _ => return Ok(()),
     };

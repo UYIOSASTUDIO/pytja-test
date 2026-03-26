@@ -1,6 +1,7 @@
 pub mod sqlite;
 pub mod postgres;
 pub mod pgvector;
+pub mod sqlite_vec;
 
 use crate::repo::{PytjaRepository, VectorStore};
 use crate::error::PytjaError;
@@ -20,6 +21,10 @@ pub enum DatabaseType {
     /// PostgreSQL with pgvector extension for vector similarity search.
     /// Connection string should point to a PostgreSQL instance with pgvector installed.
     PgVector,
+    /// Embedded SQLite-based vector store with pure Rust similarity search.
+    /// Path should be a filesystem path to the SQLite database file.
+    /// Ideal for local development, edge deployments, and zero-dependency setups.
+    SqliteVec,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -101,6 +106,17 @@ impl DriverManager {
                     map.insert(name.to_string(), store);
                 }
                 info!("Mounted vector store '{}' (PgVector)", name);
+            },
+            DatabaseType::SqliteVec => {
+                // SqliteVec mounts go into the vector_connections registry
+                let driver = sqlite_vec::SqliteVecDriver::new(path).await?;
+                driver.vector_init().await?;
+                let store: Arc<dyn VectorStore> = Arc::new(driver);
+                {
+                    let mut map = self.vector_connections.write().await;
+                    map.insert(name.to_string(), store);
+                }
+                info!("Mounted vector store '{}' (SqliteVec)", name);
             },
             _ => {
                 // Standard relational database mounts

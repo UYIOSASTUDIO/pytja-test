@@ -8,5 +8,20 @@
     "name": "primary",
     "path": "data/pytja.db",
     "db_type": "Sqlite"
+  },
+  {
+    "name": "testpostgres",
+    "path": "postgres://pytja:vectorpass@127.0.0.1:5434/pytja_vectors",
+    "db_type": "Postgres"
+  },
+  {
+    "name": "vectors",
+    "path": "postgres://pytja:vectorpass@127.0.0.1:5434/pytja_vectors",
+    "db_type": "PgVector"
+  },
+  {
+    "name": "local_vectors",
+    "path": "./data/local_vectors.db",
+    "db_type": "SqliteVec"
   }
 ]

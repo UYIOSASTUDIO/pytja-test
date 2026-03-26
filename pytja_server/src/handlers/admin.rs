@@ -268,7 +268,8 @@ impl MyPytjaService {
             "sqlite" => DatabaseType::Sqlite,
             "postgres" => DatabaseType::Postgres,
             "pgvector" => DatabaseType::PgVector,
-            _ => return Err(Status::invalid_argument("Unknown DB Type. Supported: sqlite, postgres, pgvector")),
+            "sqlite_vec" | "sqlitevec" => DatabaseType::SqliteVec,
+            _ => return Err(Status::invalid_argument("Unknown DB Type. Supported: sqlite, postgres, pgvector, sqlite_vec")),
         };
 
         self.manager.mount(&req.name, &req.connection_string, db_type).await
